@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% block body %}
+{% macro f(action, id='') %}<input type="hidden" name="csrf" value="{{ csrf() }}">{% if action %}<input type="hidden" name="action" value="{{ action }}">{% endif %}{% if id != '' %}<input type="hidden" name="id" value="{{ id }}">{% endif %}{% endmacro %}
+<main class="wrap"><h1>Administración</h1>
+<div class="stats"><div><b>{{ users|length }}</b>Usuarios</div><div><b>{{ miembros }}</b>Miembros activos</div><div><b>{{ reqs|length }}</b>Pagos por revisar</div><div><b>{{ reports|length }}</b>Reportes</div></div>
+<h2>Solicitudes de membresía</h2><div class="scroll"><table>{% for r in reqs %}<tr><td>{{ r.uname }}<br><small>{{ r.email }}</small></td><td>{{ r.pname }}</td><td>Ref: {{ r.ref }}</td><td>{{ r.created[:10] }}</td>
+<td><form method="post" class="inline">{{ f('', r.id) }}<button class="btn sm" name="action" value="aprobar">Aprobar</button><button class="btn ghost sm" name="action" value="rechazar">Rechazar</button></form></td></tr>{% else %}<tr><td class="muted">Nada pendiente.</td></tr>{% endfor %}</table></div>
+<h2>Reportes</h2><div class="scroll"><table>{% for r in reports %}<tr><td>{{ r.title or 'Publicación eliminada' }}</td><td>{{ r.uname }}: {{ r.reason }}</td><td><form method="post" class="inline">{{ f('resolver', r.id) }}<button class="btn ghost sm">Marcar resuelto</button></form>{% if r.post_id %}<form method="post" class="inline">{{ f('borrar_post', r.post_id) }}<button class="btn sm" data-confirm="¿Eliminar la publicación?">Eliminar publicación</button></form>{% endif %}</td></tr>{% else %}<tr><td class="muted">Sin reportes.</td></tr>{% endfor %}</table></div>
+<div class="two"><form class="panel" method="post"><h2>Ajustes del sitio</h2>{{ f('ajustes') }}
+<label>Nombre del sitio<input name="site_name" value="{{ site_name_cfg }}" maxlength="60"></label>
+<label>Instrucciones de pago (CLABE, depósito, etc.)<textarea name="payment_instructions" rows="4">{{ pay }}</textarea></label><button class="btn">Guardar</button></form>
+<div class="panel"><h2>Planes</h2><table>{% for p in plans %}<tr><td>{{ p.name }}</td><td>{{ p.days }} días</td><td>${{ '%.0f'|format(p.price) }}</td><td><form method="post" class="inline">{{ f('plan_toggle', p.id) }}<button class="btn ghost sm">{{ 'Desactivar' if p.active else 'Activar' }}</button></form></td></tr>{% endfor %}</table>
+<form method="post" class="row" style="margin-top:1rem">{{ f('plan_nuevo') }}<label>Nombre<input name="name" required></label><label>Días<input name="days" type="number" min="1" required></label><label>Precio MXN<input name="price" type="number" min="0" step="1" required></label><div><button class="btn sm">Agregar plan</button></div></form></div></div>
+<form class="panel" method="post"><h2>Crear cuenta de creadora</h2>{{ f('crear_creadora') }}
+<div class="row"><label>Nombre<input name="name" required></label><label>Correo<input type="email" name="email" required></label><label>Contraseña temporal<input type="password" name="password" minlength="8" required></label></div><button class="btn">Crear creadora</button></form>
+<h2>Usuarios</h2><div class="scroll"><table><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Membresía hasta</th><th></th></tr>
+{% for x in users %}<tr><td>{{ x.name }}</td><td>{{ x.email }}</td><td>{{ x.role }}{% if x.role == 'creator' %} <span class="pill">{{ 'verificada' if x.verified else 'sin verificar' }}</span>{% endif %}</td><td>{{ 'Activo' if x.active else 'Suspendido' }}</td><td>{{ x.ends[:10] if x.ends else '-' }}</td>
+<td>{% if x.role != 'admin' %}<form method="post" class="inline">{{ f('', x.id) }}
+{% if x.role == 'user' %}<input name="days" type="number" min="1" placeholder="días"><button class="btn sm" name="action" value="dar_dias">Dar días</button>{% endif %}
+{% if x.role == 'creator' %}<button class="btn sm" name="action" value="verificar">{{ 'Quitar verificación' if x.verified else 'Verificar' }}</button>{% endif %}
+<button class="btn ghost sm" name="action" value="reset_pw" data-confirm="¿Generar contraseña temporal?">Resetear clave</button>
+<button class="btn ghost sm" name="action" value="toggle">{{ 'Suspender' if x.active else 'Reactivar' }}</button>
+<button class="btn ghost sm" name="action" value="borrar" data-confirm="¿Eliminar este usuario?">Eliminar</button></form>{% endif %}</td></tr>{% endfor %}</table></div>
+<h2>Publicaciones ({{ posts|length }})</h2><div class="scroll"><table>{% for p in posts %}<tr><td>{{ p.title }}</td><td>{{ p.kind }}</td><td>{{ 'Gratis' if p.public else 'Miembros' }}</td><td>{{ p.created[:10] }}</td>
+<td><form method="post" class="inline">{{ f('borrar_post', p.id) }}<button class="btn ghost sm" data-confirm="¿Eliminar?">Eliminar</button></form></td></tr>{% else %}<tr><td class="muted">Sin publicaciones.</td></tr>{% endfor %}</table></div></main>{% endblock %}

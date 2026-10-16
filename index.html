@@ -1,0 +1,16 @@
+{% extends "base.html" %}{% block body %}
+<section class="hero"><div class="wrap hero-in">
+{% if creator and creator.avatar %}<img class="avatar" src="{{ url_for('media', name=creator.avatar) }}" alt="">{% else %}<div class="avatar"></div>{% endif %}
+<div><h1>{{ creator.name if creator else site_name }}</h1>
+<p>{{ creator.bio if creator and creator.bio else 'Contenido exclusivo para quien se une.' }}</p>
+{% if not me %}<a class="btn gold" href="{{ url_for('register') }}">Crear cuenta para ver todo</a>{% elif not access %}<a class="btn gold" href="{{ url_for('cuenta') }}">Hazte miembro</a>{% endif %}</div></div></section>
+<main class="wrap"><h2>Publicaciones</h2>
+{% if not posts %}<p class="muted">Aún no hay publicaciones. Vuelve pronto.</p>{% endif %}
+<div class="grid">{% for p in posts %}<article class="card">
+{% if p.public or access %}
+{% if p.kind == 'video' %}<video controls preload="metadata" src="{{ url_for('media', name=p.filename) }}"></video>
+{% else %}<img loading="lazy" src="{{ url_for('media', name=p.filename) }}" alt="{{ p.title }}">{% endif %}
+{% else %}<a class="lock" href="{{ url_for('cuenta') if me else url_for('register') }}"><b>Solo para miembros</b><span>{{ 'Activa tu membresía para ver' if me else 'Crea tu cuenta para ver' }}</span></a>{% endif %}
+<div class="cap"><h3>{{ p.title }}</h3>{% if p.caption and (p.public or access) %}<p>{{ p.caption }}</p>{% endif %}
+{% if me and me.role == 'user' %}<form method="post" action="{{ url_for('report', pid=p.id) }}" class="inline"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="reason" value="Contenido reportado"><button class="link rep">Reportar</button></form>{% endif %}</div></article>{% endfor %}</div></main>
+{% endblock %}

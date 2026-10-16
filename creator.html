@@ -1,0 +1,23 @@
+{% extends "base.html" %}{% block body %}
+<main class="wrap"><h1>Mi panel</h1>
+{% if not u.verified %}<p class="flash">Tu cuenta está pendiente de verificación (edad y consentimiento). Podrás publicar cuando el administrador la apruebe.</p>{% endif %}
+<div class="two">
+<form class="panel" method="post" enctype="multipart/form-data"><h2>Nueva publicación</h2>
+<input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="action" value="post">
+<label>Título<input name="title" required maxlength="100"></label>
+<label>Descripción<textarea name="caption" maxlength="500" rows="3"></textarea></label>
+<label>Foto o video<input type="file" name="file" required accept="image/*,video/mp4,video/webm,video/quicktime"></label>
+<label class="chk"><input type="checkbox" name="public"> Vista previa gratis (la ve cualquiera)</label>
+<button class="btn">Publicar</button></form>
+<form class="panel" method="post" enctype="multipart/form-data"><h2>Mi perfil</h2>
+<input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="action" value="profile">
+<label>Nombre<input name="name" value="{{ u.name }}" maxlength="60"></label>
+<label>Bio<textarea name="bio" maxlength="600" rows="4">{{ u.bio }}</textarea></label>
+<label>Foto de perfil<input type="file" name="avatar" accept="image/*"></label>
+<button class="btn">Guardar perfil</button></form></div>
+<h2>Mis publicaciones</h2>
+<div class="grid">{% for p in posts %}<article class="card">
+{% if p.kind == 'video' %}<video controls preload="metadata" src="{{ url_for('media', name=p.filename) }}"></video>{% else %}<img loading="lazy" src="{{ url_for('media', name=p.filename) }}" alt="">{% endif %}
+<div class="cap"><h3>{{ p.title }}</h3><p class="muted">{{ 'Vista previa gratis' if p.public else 'Solo miembros' }}</p>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="action" value="delete"><input type="hidden" name="id" value="{{ p.id }}"><button class="btn ghost sm" data-confirm="¿Eliminar esta publicación?">Eliminar</button></form></div></article>
+{% else %}<p class="muted">Todavía no has publicado nada.</p>{% endfor %}</div></main>{% endblock %}

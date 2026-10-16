@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block body %}
+<main class="wrap"><div class="panel narrow">
+{% if mode == 'denied' %}<h1>Sin acceso</h1><p>Esta sección no está disponible para tu cuenta.</p><a class="btn" href="{{ url_for('index') }}">Volver al inicio</a>
+{% else %}
+<h1>{{ 'Crear cuenta' if mode == 'register' else 'Entrar' }}</h1>
+<form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}">
+{% if mode == 'register' %}<label>Nombre<input name="name" required maxlength="60" autocomplete="name"></label>{% endif %}
+<label>Correo<input type="email" name="email" required autocomplete="email"></label>
+<label>Contraseña<input type="password" name="password" required minlength="{{ 8 if mode == 'register' else 1 }}" autocomplete="{{ 'new-password' if mode == 'register' else 'current-password' }}"></label>
+{% if mode == 'register' %}<label class="chk"><input type="checkbox" name="adult" required> Confirmo que tengo 18 años o más</label>{% endif %}
+<button class="btn">{{ 'Crear mi cuenta' if mode == 'register' else 'Entrar' }}</button></form>
+<p class="muted">{% if mode == 'register' %}¿Ya tienes cuenta? <a href="{{ url_for('login') }}">Entrar</a>{% else %}¿Eres nuevo? <a href="{{ url_for('register') }}">Crea tu cuenta</a>{% endif %}</p>
+{% endif %}</div></main>{% endblock %}

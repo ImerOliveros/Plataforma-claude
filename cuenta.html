@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block body %}
+<main class="wrap"><h1>Mi cuenta</h1>
+<div class="panel"><h2>Membresía</h2>
+{% if access and me.role == 'user' %}<p>Membresía activa hasta <b>{{ ends[:10] }}</b>.</p>
+{% elif me.role != 'user' %}<p>Tu rol tiene acceso completo.</p>{% else %}<p>No tienes una membresía activa.{% if ends %} Venció el {{ ends[:10] }}.{% endif %}</p>{% endif %}
+{% if me.role == 'user' %}<div class="two"><form method="post"><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="action" value="solicitar">
+<h3>{{ 'Renovar' if ends else 'Solicitar membresía' }}</h3><p class="muted" style="white-space:pre-line">{{ how }}</p>
+<label>Plan<select name="plan">{% for p in plans %}<option value="{{ p.id }}">{{ p.name }} - {{ p.days }} días - ${{ '%.0f'|format(p.price) }} MXN</option>{% endfor %}</select></label>
+<label>Referencia o folio de tu pago<input name="ref" maxlength="200" required></label><button class="btn">Enviar solicitud</button></form>
+<div><h3>Mis solicitudes</h3>{% for r in reqs %}<p>{{ r.pname }}: <span class="pill">{{ r.status }}</span> <span class="muted">{{ r.created[:10] }}</span></p>{% else %}<p class="muted">Sin solicitudes.</p>{% endfor %}</div></div>{% endif %}</div>
+<form class="panel narrow" method="post" style="margin-left:0"><h2>Cambiar contraseña</h2><input type="hidden" name="csrf" value="{{ csrf() }}"><input type="hidden" name="action" value="password">
+<label>Contraseña actual<input type="password" name="old" required autocomplete="current-password"></label>
+<label>Nueva contraseña<input type="password" name="new" minlength="8" required autocomplete="new-password"></label><button class="btn">Guardar</button></form></main>{% endblock %}

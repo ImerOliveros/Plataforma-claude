@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block body %}
+<main class="wrap"><div class="panel">
+{% if which == 'terminos' %}<h1>Términos de uso</h1>
+<p>Este sitio es solo para personas mayores de 18 años. Al registrarte confirmas tu edad.</p>
+<p>El contenido es de uso personal. No se permite descargarlo, copiarlo ni compartirlo fuera del sitio.</p>
+<p>Puedes reportar cualquier publicación con el botón "Reportar". La administración revisa los reportes y retira el contenido que incumpla las reglas.</p>
+<p>La membresía se activa al confirmar tu pago y vence en la fecha indicada en tu cuenta. La administración puede suspender cuentas que incumplan estos términos.</p>
+{% else %}<h1>Aviso de privacidad</h1>
+<p>Guardamos tu nombre, correo y una contraseña cifrada para que puedas entrar, además de tu historial de membresía y solicitudes de pago.</p>
+<p>No vendemos ni compartimos tus datos. Puedes pedir que se elimine tu cuenta a la administración.</p>{% endif %}
+<p class="muted">Texto base: debe revisarse y completarse con la información legal del titular del sitio.</p></div></main>{% endblock %}
